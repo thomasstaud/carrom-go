@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://biudnwi66x75g"]
+
+[ext_resource type="Texture2D" uid="uid://dw8n07s8hfar0" path="res://wood_texture.jpg" id="1_e2o6t"]
+[ext_resource type="Script" uid="uid://c7pmjn7kd7mpk" path="res://game.gd" id="1_feb5d"]
+[ext_resource type="Texture2D" uid="uid://cpwxt634ygps4" path="res://board_9x9.png" id="2_feb5d"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_feb5d")
+
+[node name="WoodTexture" type="Sprite2D" parent="."]
+position = Vector2(573, 382)
+scale = Vector2(0.588667, 0.588667)
+texture = ExtResource("1_e2o6t")
+
+[node name="Board9x9" type="Sprite2D" parent="."]
+position = Vector2(581, 319)
+rotation = -1.5708
+texture = ExtResource("2_feb5d")
+
+[node name="StoneContainer" type="Node2D" parent="."]
