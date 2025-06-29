@@ -8,6 +8,8 @@ enum State {
 
 const STONE = preload("res://stone.tscn")
 const STONE_DIAMETER: float = 55.0
+
+# --- physics ---
 const SHOOT_SPEED: float = 0.1
 const MIN_SHOOT_SPEED: float = 0.25
 # 1.0 is no friction, 0.0 is no movement
@@ -16,6 +18,9 @@ const SLICKNESS: float = 0.99
 const BOUNCINESS: float = 0.6
 # higher value means worse performance but better collisions
 const COLLISION_PRECISION: float = 2.0
+
+# --- board ---
+const BOARD_SIZE := Vector2(9, 9)
 # placement bounds
 const X_BLACK: int = 261
 const X_WHITE: int = 901
@@ -57,6 +62,9 @@ func positioning():
 		state = State.AIMING
 
 func aiming():
+	if Input.is_action_pressed("ui_cancel"):
+		state = State.POSITIONING
+	
 	if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		shoot()
 
@@ -66,7 +74,7 @@ func shooting():
 	# too slow
 	if shooting_dir.length() < MIN_SHOOT_SPEED:
 		if shot_valid:
-			# TODO: snap stone to grid
+			current_stone.position = snap_position_to_grid(current_stone.position)
 			placed_stones.append(current_stone)
 		else:
 			current_stone.queue_free()
@@ -105,16 +113,30 @@ func shooting():
 				return
 
 
+func shoot():
+	shooting_dir = get_viewport().get_mouse_position() - current_stone.position
+	shot_valid = false
+	state = State.SHOOTING
+
 func in_bounds(pos: Vector2, bounds: Vector4):
 	return pos.x >= bounds.x \
 		and pos.x <= bounds.z \
 		and pos.y >= bounds.y \
 		and pos.y <= bounds.w
 
-func shoot():
-	shooting_dir = get_viewport().get_mouse_position() - current_stone.position
-	shot_valid = false
-	state = State.SHOOTING
+func get_cell_size() -> Vector2:
+	return Vector2(
+		(BOARD_BOUNDS.z - BOARD_BOUNDS.x) / (BOARD_SIZE.x - 1),
+		(BOARD_BOUNDS.w - BOARD_BOUNDS.y) / (BOARD_SIZE.y - 1)
+	)
+
+func snap_position_to_grid(pos: Vector2) -> Vector2:
+	var cell_size: Vector2 = get_cell_size()
+	
+	return Vector2(
+		round((pos.x - BOARD_BOUNDS.x) / cell_size.x) * cell_size.x + BOARD_BOUNDS.x,
+		round((pos.y - BOARD_BOUNDS.y) / cell_size.y) * cell_size.y + BOARD_BOUNDS.y
+	)
 
 func next_turn():
 	turn_black = !turn_black
