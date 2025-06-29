@@ -7,7 +7,15 @@ enum State {
 }
 
 const STONE = preload("res://stone.tscn")
+const STONE_DIAMETER: float = 55.0
 const SHOOT_SPEED: float = 0.1
+const MIN_SHOOT_SPEED: float = 0.25
+# 1.0 is no friction, 0.0 is no movement
+const SLICKNESS: float = 0.99
+# 1.0 is full bounce, 0.0 is no bounce
+const BOUNCINESS: float = 0.6
+# higher value means worse performance but better collisions
+const COLLISION_PRECISION: float = 2.0
 # placement bounds
 const X_BLACK: int = 261
 const X_WHITE: int = 901
@@ -21,6 +29,7 @@ const BOARD_BOUNDS := Vector4(326, 64, 836, 574)
 var state: State
 var turn_black := false
 var current_stone: Node2D
+var placed_stones: Array[Node2D] = []
 var shooting_dir: Vector2
 var shot_valid: bool
 
@@ -52,20 +61,48 @@ func aiming():
 		shoot()
 
 func shooting():
-	# TODO: collide with borders and stones
+	shooting_dir *= SLICKNESS
 	
-	if shot_valid and not in_bounds(current_stone.position, BOARD_BOUNDS):
+	# too slow
+	if shooting_dir.length() < MIN_SHOOT_SPEED:
+		if shot_valid:
+			# TODO: snap stone to grid
+			placed_stones.append(current_stone)
+		else:
+			current_stone.queue_free()
 		next_turn()
 		return
 	
-	if not shot_valid:
-		if in_bounds(current_stone.position, BOARD_BOUNDS):
-			shot_valid = true
-		if not in_bounds(current_stone.position, SCREEN_BOUNDS):
-			next_turn()
-			return
+	var movement: Vector2 = shooting_dir * SHOOT_SPEED
+	var increments: int = ceil(movement.length() * COLLISION_PRECISION)
 	
-	current_stone.position += shooting_dir * SHOOT_SPEED
+	for i in range(increments):
+		current_stone.position += movement / increments
+		
+		# collide with other stones
+		for stone in placed_stones:
+			var vec = current_stone.position - stone.position
+			if vec.length() <= STONE_DIAMETER:
+				# collision
+				shooting_dir = shooting_dir.reflect(vec.normalized().orthogonal()) * BOUNCINESS
+				return
+		
+		# collide with border
+		if shot_valid:
+			if current_stone.position.x < BOARD_BOUNDS.x or current_stone.position.x > BOARD_BOUNDS.z:
+				shooting_dir = shooting_dir.reflect(Vector2.UP) * BOUNCINESS
+				return
+			if current_stone.position.y < BOARD_BOUNDS.y or current_stone.position.y > BOARD_BOUNDS.w:
+				shooting_dir = shooting_dir.reflect(Vector2.RIGHT) * BOUNCINESS
+				return
+		
+		if not shot_valid:
+			if in_bounds(current_stone.position, BOARD_BOUNDS):
+				shot_valid = true
+			if not in_bounds(current_stone.position, SCREEN_BOUNDS):
+				current_stone.queue_free()
+				next_turn()
+				return
 
 
 func in_bounds(pos: Vector2, bounds: Vector4):
