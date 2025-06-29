@@ -11,6 +11,8 @@ config_version=5
 [application]
 
 config/name="carrom-go"
+config/description="carrom go!!!"
+config/version="0.1"
 run/main_scene="uid://biudnwi66x75g"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="uid://w83sc6yiut7x"

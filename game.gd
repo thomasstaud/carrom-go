@@ -7,7 +7,7 @@ enum State {
 	SHOOTING,
 }
 
-const STONE = preload("res://stone.tscn")
+const STONE = preload("res://stones/stone.tscn")
 const STONE_DIAMETER: float = 55.0
 
 # --- physics ---
@@ -20,7 +20,7 @@ const BOUNCINESS: float = 0.6
 # higher value means worse performance but better collisions
 const COLLISION_PRECISION: float = 2.0
 
-# TODO: tie this to its own node
+# TODO: move this to the board node
 # --- board ---
 const BOARD_SIZE := Vector2(9, 9)
 # placement bounds

@@ -1,8 +1,8 @@
 class_name Stone
 extends Node2D
 
-const TEXTURE_BLACK = preload("res://stone_black.png")
-const TEXTURE_WHITE = preload("res://stone_white.png")
+const TEXTURE_BLACK = preload("res://stones/stone_black.png")
+const TEXTURE_WHITE = preload("res://stones/stone_white.png")
 
 var board_pos: Vector2i
 
