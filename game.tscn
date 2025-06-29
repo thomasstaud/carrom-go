@@ -1,11 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://biudnwi66x75g"]
+[gd_scene load_steps=5 format=3 uid="uid://biudnwi66x75g"]
 
 [ext_resource type="Texture2D" uid="uid://dw8n07s8hfar0" path="res://wood_texture.jpg" id="1_e2o6t"]
 [ext_resource type="Script" uid="uid://c7pmjn7kd7mpk" path="res://game.gd" id="1_feb5d"]
+[ext_resource type="Script" uid="uid://td14ndn5ho11" path="res://go.gd" id="2_fc0e3"]
 [ext_resource type="Texture2D" uid="uid://cpwxt634ygps4" path="res://board_9x9.png" id="2_feb5d"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_feb5d")
+
+[node name="Go" type="Node" parent="."]
+script = ExtResource("2_fc0e3")
 
 [node name="WoodTexture" type="Sprite2D" parent="."]
 position = Vector2(573, 382)

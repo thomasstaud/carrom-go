@@ -1,3 +1,4 @@
+class_name Game
 extends Node2D
 
 enum State {
@@ -10,7 +11,7 @@ const STONE = preload("res://stone.tscn")
 const STONE_DIAMETER: float = 55.0
 
 # --- physics ---
-const SHOOT_SPEED: float = 0.1
+const SHOOT_SPEED: float = 0.05
 const MIN_SHOOT_SPEED: float = 0.25
 # 1.0 is no friction, 0.0 is no movement
 const SLICKNESS: float = 0.99
@@ -19,6 +20,7 @@ const BOUNCINESS: float = 0.6
 # higher value means worse performance but better collisions
 const COLLISION_PRECISION: float = 2.0
 
+# TODO: tie this to its own node
 # --- board ---
 const BOARD_SIZE := Vector2(9, 9)
 # placement bounds
@@ -28,20 +30,23 @@ const Y_MIN: int = 63
 const Y_MAX: int = 575
 # shooting bounds
 const SCREEN_BOUNDS := Vector4(-50, -50, 1200, 700)
+# TODO: increase bounds by stone radius
 const BOARD_BOUNDS := Vector4(326, 64, 836, 574)
-
 
 var state: State
 var turn_black := false
-var current_stone: Node2D
-var placed_stones: Array[Node2D] = []
+var current_stone: Stone
+# stores each stone by its board position
+var placed_stones: Dictionary[Vector2i, Stone] = {}
 var shooting_dir: Vector2
 var shot_valid: bool
 
+@onready var go: Go = $Go
 @onready var stone_container: Node2D = $StoneContainer
 
-
 func _ready() -> void:
+	go.init(BOARD_SIZE)
+	go.stone_captured.connect(stone_captured)
 	next_turn()
 
 func _process(_delta: float) -> void:
@@ -74,8 +79,13 @@ func shooting():
 	# too slow
 	if shooting_dir.length() < MIN_SHOOT_SPEED:
 		if shot_valid:
-			current_stone.position = snap_position_to_grid(current_stone.position)
-			placed_stones.append(current_stone)
+			# snap in place
+			var board_pos = world_to_board_pos(current_stone.position)
+			current_stone.board_pos = board_pos
+			current_stone.position = board_to_world_pos(board_pos)
+			# make go move
+			go.add_stone(board_pos, turn_black)
+			placed_stones[board_pos] = current_stone
 		else:
 			current_stone.queue_free()
 		next_turn()
@@ -88,7 +98,7 @@ func shooting():
 		current_stone.position += movement / increments
 		
 		# collide with other stones
-		for stone in placed_stones:
+		for stone in placed_stones.values():
 			var vec = current_stone.position - stone.position
 			if vec.length() <= STONE_DIAMETER:
 				# collision
@@ -130,12 +140,20 @@ func get_cell_size() -> Vector2:
 		(BOARD_BOUNDS.w - BOARD_BOUNDS.y) / (BOARD_SIZE.y - 1)
 	)
 
-func snap_position_to_grid(pos: Vector2) -> Vector2:
+func world_to_board_pos(pos: Vector2) -> Vector2i:
 	var cell_size: Vector2 = get_cell_size()
 	
 	return Vector2(
-		round((pos.x - BOARD_BOUNDS.x) / cell_size.x) * cell_size.x + BOARD_BOUNDS.x,
-		round((pos.y - BOARD_BOUNDS.y) / cell_size.y) * cell_size.y + BOARD_BOUNDS.y
+		round((pos.x - BOARD_BOUNDS.x) / cell_size.x),
+		round((pos.y - BOARD_BOUNDS.y) / cell_size.y)
+	)
+
+func board_to_world_pos(pos: Vector2i) -> Vector2:
+	var cell_size: Vector2 = get_cell_size()
+	
+	return Vector2(
+		pos.x * cell_size.x + BOARD_BOUNDS.x,
+		pos.y * cell_size.y + BOARD_BOUNDS.y
 	)
 
 func next_turn():
@@ -149,3 +167,6 @@ func new_stone(black: bool):
 	stone.set_texture(black)
 	stone.position.x = X_BLACK if black else X_WHITE
 	return stone
+
+func stone_captured(pos: Vector2i) -> void:
+	placed_stones[pos].queue_free()
