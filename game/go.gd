@@ -11,6 +11,7 @@ enum Point {
 
 var _board_size: Vector2i
 var _points: Dictionary[Vector2i, Point]
+var _captured: Dictionary[int, int]
 
 func init(board_size: Vector2i) -> void:
 	_board_size = board_size
@@ -18,6 +19,9 @@ func init(board_size: Vector2i) -> void:
 	for x in board_size.x:
 		for y in board_size.y:
 			_points[Vector2i(x, y)] = Point.EMPTY
+	
+	_captured[Point.BLACK] = 0
+	_captured[Point.WHITE] = 0
 
 func add_stone(pos: Vector2i, black: bool) -> void:
 	var color = Point.BLACK if black else Point.WHITE
@@ -42,6 +46,10 @@ func add_stone(pos: Vector2i, black: bool) -> void:
 	if not dead_self:
 		return
 	_capture_stones_if_dead(pos)
+
+## returns number of captured stones as {1: captured black stones, 2: captured white stones}
+func get_captured() -> Dictionary[int, int]:
+	return _captured
 
 
 func _capture_stones_if_dead(pos: Vector2i) -> bool:
@@ -77,6 +85,7 @@ func _get_group_if_dead(pos: Vector2i) -> Array[Vector2i]:
 
 func _capture_stones(positions: Array[Vector2i]) -> void:
 	for pos in positions:
+		_captured[_points[pos]] += 1
 		_points[pos] = Point.EMPTY
 		stone_captured.emit(pos)
 

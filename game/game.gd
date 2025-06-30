@@ -1,12 +1,15 @@
 class_name Game
 extends Node2D
 
+signal end_game
+
 enum State {
 	POSITIONING,
 	AIMING,
 	SHOOTING,
 }
 
+const MENU = preload("res://ui/menu.tscn")
 const STONE = preload("res://stones/stone.tscn")
 const STONE_DIAMETER: float = 55.0
 
@@ -34,6 +37,8 @@ const SCREEN_BOUNDS := Vector4(-50, -50, 1200, 700)
 const BOARD_BOUNDS := Vector4(326, 64, 836, 574)
 
 var state: State
+# true, if a player passed in the previous turn
+var passing: bool
 var turn_black := false
 var current_stone: Stone
 # stores each stone by its board position
@@ -43,10 +48,12 @@ var shot_valid: bool
 
 @onready var go: Go = $Go
 @onready var stone_container: Node2D = $StoneContainer
+@onready var ui: UI = $UI
 
 func _ready() -> void:
 	go.init(BOARD_SIZE)
 	go.stone_captured.connect(stone_captured)
+	ui.player_passed.connect(player_passed)
 	next_turn()
 
 func _process(_delta: float) -> void:
@@ -71,6 +78,7 @@ func aiming():
 		state = State.POSITIONING
 	
 	if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		passing = false
 		shoot()
 
 func shooting():
@@ -84,8 +92,8 @@ func shooting():
 			current_stone.board_pos = board_pos
 			current_stone.position = board_to_world_pos(board_pos)
 			# make go move
-			go.add_stone(board_pos, turn_black)
 			placed_stones[board_pos] = current_stone
+			go.add_stone(board_pos, turn_black)
 		else:
 			current_stone.queue_free()
 		next_turn()
@@ -160,6 +168,8 @@ func next_turn():
 	turn_black = !turn_black
 	current_stone = new_stone(turn_black)
 	state = State.POSITIONING
+	
+	ui.set_turn(turn_black)
 
 func new_stone(black: bool):
 	var stone = STONE.instantiate()
@@ -170,3 +180,21 @@ func new_stone(black: bool):
 
 func stone_captured(pos: Vector2i) -> void:
 	placed_stones[pos].queue_free()
+
+func player_passed() -> void:
+	if passing:
+		# game is finished
+		# TODO: display this on a nice panel
+		var captured = go.get_captured()
+		if captured[1] > captured[2]:
+			print("White wins! %d to %d" % [captured[1], captured[2]])
+		elif captured[2] > captured[1]:
+			print("Black wins! %d to %d" % [captured[1], captured[2]])
+		else:
+			print("It's a tie! %d both" % captured[1])
+		# back to menu (for now)
+		end_game.emit()
+	else:
+		passing = true
+		current_stone.queue_free()
+		next_turn()
