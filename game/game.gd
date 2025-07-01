@@ -11,7 +11,7 @@ enum State {
 
 const MENU = preload("res://ui/menu.tscn")
 const STONE = preload("res://stones/stone.tscn")
-const STONE_DIAMETER: float = 55.0
+const STONE_DIAMETER: float = 38.0
 
 # --- physics ---
 const SHOOT_SPEED: float = 0.05
@@ -21,20 +21,10 @@ const SLICKNESS: float = 0.99
 # 1.0 is full bounce, 0.0 is no bounce
 const BOUNCINESS: float = 0.6
 # higher value means worse performance but better collisions
-const COLLISION_PRECISION: float = 2.0
+const COLLISION_PRECISION: float = 4.0
 
-# TODO: move this to the board node
-# --- board ---
-const BOARD_SIZE := Vector2(9, 9)
-# placement bounds
-const X_BLACK: int = 261
-const X_WHITE: int = 901
-const Y_MIN: int = 63
-const Y_MAX: int = 575
-# shooting bounds
+# TODO: just use actual screen size + stone radius bounds
 const SCREEN_BOUNDS := Vector4(-50, -50, 1200, 700)
-# TODO: increase bounds by stone radius
-const BOARD_BOUNDS := Vector4(326, 64, 836, 574)
 
 var state: State
 # true, if a player passed in the previous turn
@@ -47,11 +37,12 @@ var shooting_dir: Vector2
 var shot_valid: bool
 
 @onready var go: Go = $Go
+@onready var board: Board = $Board
 @onready var stone_container: Node2D = $StoneContainer
 @onready var ui: UI = $UI
 
 func _ready() -> void:
-	go.init(BOARD_SIZE)
+	go.init(board.size)
 	go.stone_captured.connect(stone_captured)
 	ui.player_passed.connect(player_passed)
 	next_turn()
@@ -69,7 +60,7 @@ func _process(_delta: float) -> void:
 func positioning():
 	# TODO: no red circle overlap
 	var mouse_y = get_viewport().get_mouse_position().y
-	current_stone.position.y = clamp(mouse_y, Y_MIN, Y_MAX)
+	current_stone.position.y = clamp(mouse_y, board.y_min, board.y_max)
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		state = State.AIMING
 
@@ -88,7 +79,10 @@ func shooting():
 	if shooting_dir.length() < MIN_SHOOT_SPEED:
 		if shot_valid:
 			# snap in place
-			var board_pos = world_to_board_pos(current_stone.position)
+			# TODO: get 4 closest positions and pick the closest non-occupied one
+			var board_pos = closest_unoccupied_board_pos(current_stone.position)
+			print(board_pos)
+			print(four_closest_board_pos(current_stone.position))
 			current_stone.board_pos = board_pos
 			current_stone.position = board_to_world_pos(board_pos)
 			# make go move
@@ -115,15 +109,15 @@ func shooting():
 		
 		# collide with border
 		if shot_valid:
-			if current_stone.position.x < BOARD_BOUNDS.x or current_stone.position.x > BOARD_BOUNDS.z:
+			if current_stone.position.x < board.bounds.x or current_stone.position.x > board.bounds.z:
 				shooting_dir = shooting_dir.reflect(Vector2.UP) * BOUNCINESS
 				return
-			if current_stone.position.y < BOARD_BOUNDS.y or current_stone.position.y > BOARD_BOUNDS.w:
+			if current_stone.position.y < board.bounds.y or current_stone.position.y > board.bounds.w:
 				shooting_dir = shooting_dir.reflect(Vector2.RIGHT) * BOUNCINESS
 				return
 		
 		if not shot_valid:
-			if in_bounds(current_stone.position, BOARD_BOUNDS):
+			if in_bounds(current_stone.position, board.bounds):
 				shot_valid = true
 			if not in_bounds(current_stone.position, SCREEN_BOUNDS):
 				current_stone.queue_free()
@@ -144,24 +138,52 @@ func in_bounds(pos: Vector2, bounds: Vector4):
 
 func get_cell_size() -> Vector2:
 	return Vector2(
-		(BOARD_BOUNDS.z - BOARD_BOUNDS.x) / (BOARD_SIZE.x - 1),
-		(BOARD_BOUNDS.w - BOARD_BOUNDS.y) / (BOARD_SIZE.y - 1)
+		(board.bounds.z - board.bounds.x) / (board.size.x - 1),
+		(board.bounds.w - board.bounds.y) / (board.size.y - 1)
 	)
 
-func world_to_board_pos(pos: Vector2) -> Vector2i:
+func closest_unoccupied_board_pos(pos: Vector2) -> Vector2i:
+	var poss: Array[Vector2i] = four_closest_board_pos(pos)
+	var actual: Vector2 = world_to_board_pos_unrounded(pos)
+	
+	poss.sort_custom(func(a: Vector2, b: Vector2): return a.distance_to(actual) < b.distance_to(actual))
+	for check in poss:
+		if check not in placed_stones:
+			return check
+	printerr("something has gone really wrong")
+	return Vector2i(-1, -1)
+
+func four_closest_board_pos(pos: Vector2) -> Array[Vector2i]:
+	var cell_size: Vector2 = get_cell_size()
+	var x = [
+		floor((pos.x - board.bounds.x) / cell_size.x),
+		ceil((pos.x - board.bounds.x) / cell_size.x)
+	]
+	var y = [
+		floor((pos.y - board.bounds.y) / cell_size.y),
+		ceil((pos.y - board.bounds.y) / cell_size.y)
+	]
+	
+	var res: Array[Vector2i] = []
+	for i in range(4):
+		@warning_ignore("integer_division")
+		res.append(Vector2i(x[i % 2], y[i / 2]))
+	return res
+
+func world_to_board_pos_unrounded(pos: Vector2) -> Vector2:
 	var cell_size: Vector2 = get_cell_size()
 	
 	return Vector2(
-		round((pos.x - BOARD_BOUNDS.x) / cell_size.x),
-		round((pos.y - BOARD_BOUNDS.y) / cell_size.y)
+		(pos.x - board.bounds.x) / cell_size.x,
+		(pos.y - board.bounds.y) / cell_size.y
 	)
 
 func board_to_world_pos(pos: Vector2i) -> Vector2:
 	var cell_size: Vector2 = get_cell_size()
 	
 	return Vector2(
-		pos.x * cell_size.x + BOARD_BOUNDS.x,
-		pos.y * cell_size.y + BOARD_BOUNDS.y
+		pos.x * cell_size.x + board.bounds.x,
+		pos.y * cell_size.y + board.bounds.y
 	)
 
 func next_turn():
@@ -175,11 +197,12 @@ func new_stone(black: bool):
 	var stone = STONE.instantiate()
 	stone_container.add_child(stone)
 	stone.set_texture(black)
-	stone.position.x = X_BLACK if black else X_WHITE
+	stone.position.x = board.x_black if black else board.x_white
 	return stone
 
 func stone_captured(pos: Vector2i) -> void:
 	placed_stones[pos].queue_free()
+	placed_stones.erase(pos)
 
 func player_passed() -> void:
 	if passing:

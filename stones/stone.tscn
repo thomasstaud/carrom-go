@@ -1,11 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://du5umawtva6vn"]
+[gd_scene load_steps=4 format=3 uid="uid://du5umawtva6vn"]
 
 [ext_resource type="Texture2D" uid="uid://ceeyblojvmr1u" path="res://stones/stone_black.png" id="1_6s6ed"]
 [ext_resource type="Script" uid="uid://cqdd4e7vjq8ni" path="res://stones/stone.gd" id="1_rq0vd"]
 
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_ansb5"]
+size = Vector2(38, 38)
+
 [node name="Stone" type="Node2D"]
 script = ExtResource("1_rq0vd")
 
+[node name="SizeComparison" type="Sprite2D" parent="."]
+visible = false
+texture = SubResource("PlaceholderTexture2D_ansb5")
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.22, 0.22)
+scale = Vector2(0.15, 0.15)
 texture = ExtResource("1_6s6ed")

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c7pmjn7kd7mpk" path="res://game/game.gd" id="1_feb5d"]
 [ext_resource type="Script" uid="uid://td14ndn5ho11" path="res://game/go.gd" id="2_fc0e3"]
-[ext_resource type="PackedScene" uid="uid://ci5pbfr5nyayu" path="res://board/board.tscn" id="3_feb5d"]
+[ext_resource type="PackedScene" uid="uid://ci5pbfr5nyayu" path="res://board/board_9x9.tscn" id="3_feb5d"]
 [ext_resource type="Texture2D" uid="uid://flf2fiipa5nc" path="res://ui/assets/button_normal.png" id="4_eow3j"]
 [ext_resource type="Script" uid="uid://co26hhbdo4hdo" path="res://ui/game_ui.gd" id="4_hve3p"]
 [ext_resource type="Texture2D" uid="uid://cple8snaikfg5" path="res://ui/assets/button_pressed.png" id="5_j5wjh"]

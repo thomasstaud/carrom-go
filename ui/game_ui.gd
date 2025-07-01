@@ -12,6 +12,8 @@ var _turn_black: bool
 @onready var banner_white: TextureRect = $BannerWhite
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
+# TODO: display number of stones captured
+
 func set_turn(black: bool):
 	_turn_black = black
 	var anim = TURN_BLACK_ANIM if black else TURN_WHITE_ANIM
