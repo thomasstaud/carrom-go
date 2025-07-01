@@ -1,8 +1,15 @@
-[gd_resource type="Theme" load_steps=2 format=3 uid="uid://dlbjtfagpatv2"]
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://dlbjtfagpatv2"]
 
 [ext_resource type="FontFile" uid="uid://dkeyykt1wws14" path="res://ui/fonts/onyx/OPTIOnyx.otf" id="1_rqugq"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rqugq"]
 
 [resource]
 Label/colors/font_color = Color(0.905882, 0.878431, 0.815686, 1)
 Label/font_sizes/font_size = 40
 Label/fonts/font = ExtResource("1_rqugq")
+LineEdit/colors/font_color = Color(0.905882, 0.878431, 0.815686, 1)
+LineEdit/colors/font_uneditable_color = Color(0.905882, 0.878431, 0.815686, 1)
+LineEdit/font_sizes/font_size = 40
+LineEdit/fonts/font = ExtResource("1_rqugq")
+LineEdit/styles/read_only = SubResource("StyleBoxEmpty_rqugq")

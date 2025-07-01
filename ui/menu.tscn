@@ -1,5 +1,6 @@
-[gd_scene load_steps=13 format=3 uid="uid://ui4daufc78s"]
+[gd_scene load_steps=12 format=3 uid="uid://ui4daufc78s"]
 
+[ext_resource type="Theme" uid="uid://dlbjtfagpatv2" path="res://ui/theme.tres" id="1_7toyc"]
 [ext_resource type="Texture2D" uid="uid://dw8n07s8hfar0" path="res://board/wood_texture.jpg" id="1_bwjgb"]
 [ext_resource type="Script" uid="uid://c3or1g3g0rio5" path="res://ui/menu.gd" id="1_cp6tm"]
 [ext_resource type="Texture2D" uid="uid://c55ld4v0kryhn" path="res://ui/assets/title.png" id="2_l8jcj"]
@@ -9,9 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://7t5dsdkky6cb" path="res://ui/assets/hotseat.png" id="5_0bcp5"]
 [ext_resource type="Texture2D" uid="uid://cg54iuw3aowyi" path="res://ui/assets/random.png" id="6_l8jcj"]
 [ext_resource type="Texture2D" uid="uid://cj8rgkk174dl0" path="res://ui/assets/friend.png" id="7_cp6tm"]
-[ext_resource type="Texture2D" uid="uid://bfcheqmj7qpq1" path="res://ui/assets/panel.png" id="10_2fd1n"]
-[ext_resource type="Script" uid="uid://dl22fdr41d8t" path="res://ui/panel.gd" id="10_oumb1"]
-[ext_resource type="Texture2D" uid="uid://cqpoyxypau0jj" path="res://ui/assets/connecting.png" id="11_cop0s"]
+[ext_resource type="PackedScene" uid="uid://cyt8lcjqkpr4h" path="res://ui/multiplayer_panel.tscn" id="11_cop0s"]
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -20,6 +19,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_7toyc")
 script = ExtResource("1_cp6tm")
 
 [node name="WoodTexture" type="Sprite2D" parent="."]
@@ -137,45 +137,9 @@ texture = ExtResource("7_cp6tm")
 expand_mode = 2
 stretch_mode = 5
 
-[node name="Panel" type="Control" parent="."]
+[node name="MultiplayerPanel" parent="." instance=ExtResource("11_cop0s")]
 visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("10_oumb1")
-
-[node name="Texture" type="TextureRect" parent="Panel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -279.5
-offset_top = -189.5
-offset_right = 279.5
-offset_bottom = 189.5
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("10_2fd1n")
-
-[node name="TextureRect" type="TextureRect" parent="Panel/Texture"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -161.5
-offset_top = -53.0
-offset_right = 161.5
-offset_bottom = 53.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("11_cop0s")
 
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HotseatButton" to="." method="_on_hotseat_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/RandomButton" to="." method="_on_random_button_pressed"]

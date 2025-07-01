@@ -2,7 +2,7 @@ extends Control
 
 signal start_game
 
-@onready var panel: Control = $Panel
+@onready var multiplayer_panel: MultiplayerPanel = $MultiplayerPanel
 
 
 func _on_hotseat_button_pressed() -> void:
@@ -10,10 +10,8 @@ func _on_hotseat_button_pressed() -> void:
 
 
 func _on_random_button_pressed() -> void:
-	ConnectionManager.connect_to_server()
-	panel.show()
+	multiplayer_panel.random()
 
 
 func _on_friend_button_pressed() -> void:
-	ConnectionManager.connect_to_server()
-	panel.show()
+	multiplayer_panel.friend()

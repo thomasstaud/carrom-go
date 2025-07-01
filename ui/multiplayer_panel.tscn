@@ -1,0 +1,196 @@
+[gd_scene load_steps=12 format=3 uid="uid://cyt8lcjqkpr4h"]
+
+[ext_resource type="Script" uid="uid://dl22fdr41d8t" path="res://ui/multiplayer_panel.gd" id="1_2mte1"]
+[ext_resource type="Theme" uid="uid://dlbjtfagpatv2" path="res://ui/theme.tres" id="1_j52ps"]
+[ext_resource type="Texture2D" uid="uid://bfcheqmj7qpq1" path="res://ui/assets/panel.png" id="2_j52ps"]
+[ext_resource type="Texture2D" uid="uid://cqpoyxypau0jj" path="res://ui/assets/connecting.png" id="3_hnodw"]
+[ext_resource type="Texture2D" uid="uid://flf2fiipa5nc" path="res://ui/assets/button_normal.png" id="4_p05jl"]
+[ext_resource type="Texture2D" uid="uid://cple8snaikfg5" path="res://ui/assets/button_pressed.png" id="5_qxbnd"]
+[ext_resource type="Texture2D" uid="uid://db8lev7uthdqs" path="res://ui/assets/button_hover.png" id="6_2jjuh"]
+[ext_resource type="Texture2D" uid="uid://stk16qihfalv" path="res://ui/assets/host.png" id="8_qxbnd"]
+[ext_resource type="Texture2D" uid="uid://cm5004pa0gmbo" path="res://ui/assets/join.png" id="9_2jjuh"]
+[ext_resource type="Texture2D" uid="uid://bqf6lw3f1er5s" path="res://ui/assets/waiting.png" id="9_hnodw"]
+[ext_resource type="Texture2D" uid="uid://3i372v82kba5" path="res://ui/assets/cancel.png" id="11_pa6ct"]
+
+[node name="MultiplayerPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_j52ps")
+script = ExtResource("1_2mte1")
+
+[node name="Texture" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -279.5
+offset_top = -189.5
+offset_right = 279.5
+offset_bottom = 189.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_j52ps")
+
+[node name="Connecting" type="TextureRect" parent="Texture"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -161.5
+offset_top = -53.0
+offset_right = 161.5
+offset_bottom = 53.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_hnodw")
+
+[node name="FriendSelection" type="VBoxContainer" parent="Texture"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -46.0
+offset_top = -31.5
+offset_right = 46.0
+offset_bottom = 31.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="HostButton" type="TextureButton" parent="Texture/FriendSelection"]
+custom_minimum_size = Vector2(250, 90)
+layout_mode = 2
+texture_normal = ExtResource("4_p05jl")
+texture_pressed = ExtResource("5_qxbnd")
+texture_hover = ExtResource("6_2jjuh")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="Texture/FriendSelection/HostButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 27
+theme_override_constants/margin_bottom = 27
+
+[node name="TextureRect" type="TextureRect" parent="Texture/FriendSelection/HostButton/MarginContainer"]
+layout_mode = 2
+texture = ExtResource("8_qxbnd")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="JoinButton" type="TextureButton" parent="Texture/FriendSelection"]
+custom_minimum_size = Vector2(250, 90)
+layout_mode = 2
+texture_normal = ExtResource("4_p05jl")
+texture_pressed = ExtResource("5_qxbnd")
+texture_hover = ExtResource("6_2jjuh")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="Texture/FriendSelection/JoinButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Texture/FriendSelection/JoinButton/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="Texture/FriendSelection/JoinButton/MarginContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("9_2jjuh")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="JoinLineEdit" type="LineEdit" parent="Texture/FriendSelection/JoinButton/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 25
+placeholder_text = "Game ID"
+alignment = 1
+
+[node name="Waiting" type="VBoxContainer" parent="Texture"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="TextureRect" type="TextureRect" parent="Texture/Waiting"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("9_hnodw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HostLineEdit" type="LineEdit" parent="Texture/Waiting"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Game ID"
+alignment = 1
+editable = false
+
+[node name="CancelButton" type="TextureButton" parent="Texture/Waiting"]
+custom_minimum_size = Vector2(250, 90)
+layout_mode = 2
+texture_normal = ExtResource("4_p05jl")
+texture_pressed = ExtResource("5_qxbnd")
+texture_hover = ExtResource("6_2jjuh")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="Texture/Waiting/CancelButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 27
+theme_override_constants/margin_bottom = 27
+
+[node name="TextureRect" type="TextureRect" parent="Texture/Waiting/CancelButton/MarginContainer"]
+layout_mode = 2
+texture = ExtResource("11_pa6ct")
+expand_mode = 2
+stretch_mode = 5
+
+[connection signal="pressed" from="Texture/FriendSelection/HostButton" to="." method="_on_host_button_pressed"]
+[connection signal="pressed" from="Texture/FriendSelection/JoinButton" to="." method="_on_join_button_pressed"]
+[connection signal="pressed" from="Texture/Waiting/CancelButton" to="." method="_on_cancel_button_pressed"]
