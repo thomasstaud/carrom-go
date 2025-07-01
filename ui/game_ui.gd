@@ -8,6 +8,8 @@ const TURN_WHITE_ANIM := "turn_white"
 
 var _turn_black: bool
 
+@onready var captured_black: Label = $CapturedBlack
+@onready var captured_white: Label = $CapturedWhite
 @onready var banner_black: TextureRect = $BannerBlack
 @onready var banner_white: TextureRect = $BannerWhite
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
@@ -18,6 +20,11 @@ func set_turn(black: bool):
 	_turn_black = black
 	var anim = TURN_BLACK_ANIM if black else TURN_WHITE_ANIM
 	animation_player.play(anim)
+
+# captured must look like this: {1: captured black stones, 2: captured white stones}
+func update_captures(captures: Dictionary[int, int]):
+	captured_black.set_text("Captured:\n%d" % captures[2])
+	captured_white.set_text("Captured:\n%d" % captures[1])
 
 
 func _on_pass_button_black_pressed() -> void:

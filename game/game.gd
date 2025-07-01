@@ -81,8 +81,6 @@ func shooting():
 			# snap in place
 			# TODO: get 4 closest positions and pick the closest non-occupied one
 			var board_pos = closest_unoccupied_board_pos(current_stone.position)
-			print(board_pos)
-			print(four_closest_board_pos(current_stone.position))
 			current_stone.board_pos = board_pos
 			current_stone.position = board_to_world_pos(board_pos)
 			# make go move
@@ -203,6 +201,8 @@ func new_stone(black: bool):
 func stone_captured(pos: Vector2i) -> void:
 	placed_stones[pos].queue_free()
 	placed_stones.erase(pos)
+	
+	ui.update_captures(go.get_captured())
 
 func player_passed() -> void:
 	if passing:
@@ -212,10 +212,11 @@ func player_passed() -> void:
 		if captured[1] > captured[2]:
 			print("White wins! %d to %d" % [captured[1], captured[2]])
 		elif captured[2] > captured[1]:
-			print("Black wins! %d to %d" % [captured[1], captured[2]])
+			print("Black wins! %d to %d" % [captured[2], captured[1]])
 		else:
 			print("It's a tie! %d both" % captured[1])
 		# back to menu (for now)
+		# later, hook this up to a button on the nice panel
 		end_game.emit()
 	else:
 		passing = true
