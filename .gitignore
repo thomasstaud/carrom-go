@@ -19,3 +19,4 @@ data_*/
 mono_crash.*.json
 >>>>>>> 61210542f0288f3c53f36ff219b4d3a3ba13a293
 /build
+project.godot
