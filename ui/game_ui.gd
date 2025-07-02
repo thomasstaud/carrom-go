@@ -10,11 +10,17 @@ var _turn_black: bool
 
 @onready var captured_black: Label = $CapturedBlack
 @onready var captured_white: Label = $CapturedWhite
+@onready var pass_button_black: TextureButton = $PassButtonBlack
+@onready var pass_button_white: TextureButton = $PassButtonWhite
 @onready var banner_black: TextureRect = $BannerBlack
 @onready var banner_white: TextureRect = $BannerWhite
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
-# TODO: display number of stones captured
+func init(player: Game.Player):
+	if player == Game.Player.BLACK:
+		pass_button_white.hide()
+	if player == Game.Player.WHITE:
+		pass_button_black.hide()
 
 func set_turn(black: bool):
 	_turn_black = black

@@ -1,12 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://biudnwi66x75g"]
+[gd_scene load_steps=6 format=3 uid="uid://biudnwi66x75g"]
 
 [ext_resource type="Script" uid="uid://c7pmjn7kd7mpk" path="res://game/game.gd" id="1_feb5d"]
+[ext_resource type="Script" uid="uid://cr565wbxjhctu" path="res://multiplayer/multiplayer_controller.gd" id="2_dxrkv"]
 [ext_resource type="Script" uid="uid://td14ndn5ho11" path="res://game/go.gd" id="2_fc0e3"]
 [ext_resource type="PackedScene" uid="uid://ci5pbfr5nyayu" path="res://board/board_9x9.tscn" id="3_feb5d"]
 [ext_resource type="PackedScene" uid="uid://d0cn8jcmfck7l" path="res://ui/game_ui.tscn" id="4_4fuuu"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_feb5d")
+
+[node name="MultiplayerController" type="Node" parent="."]
+script = ExtResource("2_dxrkv")
 
 [node name="Go" type="Node" parent="."]
 script = ExtResource("2_fc0e3")

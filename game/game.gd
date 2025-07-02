@@ -9,6 +9,12 @@ enum State {
 	SHOOTING,
 }
 
+enum Player {
+	HOTSEAT,
+	BLACK,
+	WHITE,
+}
+
 const MENU = preload("res://ui/menu.tscn")
 const STONE = preload("res://stones/stone.tscn")
 const STONE_DIAMETER: float = 38.0
@@ -26,6 +32,7 @@ const COLLISION_PRECISION: float = 4.0
 # TODO: just use actual screen size + stone radius bounds
 const SCREEN_BOUNDS := Vector4(-50, -50, 1200, 700)
 
+var player: Player
 var state: State
 # true, if a player passed in the previous turn
 var passing: bool
@@ -36,15 +43,25 @@ var placed_stones: Dictionary[Vector2i, Stone] = {}
 var shooting_dir: Vector2
 var shot_valid: bool
 
+@onready var multiplayer_controller: MultiplayerController = $MultiplayerController
 @onready var go: Go = $Go
 @onready var board: Board = $Board
 @onready var stone_container: Node2D = $StoneContainer
 @onready var ui: UI = $UI
 
-func _ready() -> void:
+func init(p_player: Player):
+	print("starting game as %s" % p_player)
+	
+	player = p_player
+	if player != Player.HOTSEAT:
+		multiplayer_controller.init(self)
+	
 	go.init(board.size)
 	go.stone_captured.connect(stone_captured)
+	
+	ui.init(player)
 	ui.player_passed.connect(player_passed)
+	
 	next_turn()
 
 func _process(_delta: float) -> void:
@@ -58,6 +75,9 @@ func _process(_delta: float) -> void:
 
 
 func positioning():
+	if not acting():
+		return
+	
 	# TODO: no red circle overlap
 	var mouse_y = get_viewport().get_mouse_position().y
 	current_stone.position.y = clamp(mouse_y, board.y_min, board.y_max)
@@ -65,6 +85,9 @@ func positioning():
 		state = State.AIMING
 
 func aiming():
+	if not acting():
+		return
+	
 	if Input.is_action_pressed("ui_cancel"):
 		state = State.POSITIONING
 	
@@ -76,19 +99,17 @@ func shooting():
 	shooting_dir *= SLICKNESS
 	
 	# too slow
-	if shooting_dir.length() < MIN_SHOOT_SPEED:
+	if shooting_dir.length() < MIN_SHOOT_SPEED and acting():
 		if shot_valid:
 			# snap in place
-			# TODO: get 4 closest positions and pick the closest non-occupied one
 			var board_pos = closest_unoccupied_board_pos(current_stone.position)
-			current_stone.board_pos = board_pos
-			current_stone.position = board_to_world_pos(board_pos)
-			# make go move
-			placed_stones[board_pos] = current_stone
-			go.add_stone(board_pos, turn_black)
+			snap_stone(board_pos)
+			
+			if online():
+				multiplayer_controller.snapping_out(board_pos)
 		else:
 			current_stone.queue_free()
-		next_turn()
+			next_turn()
 		return
 	
 	var movement: Vector2 = shooting_dir * SHOOT_SPEED
@@ -117,7 +138,7 @@ func shooting():
 		if not shot_valid:
 			if in_bounds(current_stone.position, board.bounds):
 				shot_valid = true
-			if not in_bounds(current_stone.position, SCREEN_BOUNDS):
+			if not in_bounds(current_stone.position, SCREEN_BOUNDS) and acting():
 				current_stone.queue_free()
 				next_turn()
 				return
@@ -127,6 +148,18 @@ func shoot():
 	shooting_dir = get_viewport().get_mouse_position() - current_stone.position
 	shot_valid = false
 	state = State.SHOOTING
+	
+	if online():
+		multiplayer_controller.shooting_out(shooting_dir, current_stone.position)
+
+func snap_stone(board_pos: Vector2i):
+	current_stone.board_pos = board_pos
+	current_stone.position = board_to_world_pos(board_pos)
+	# make go move
+	placed_stones[board_pos] = current_stone
+	go.add_stone(board_pos, turn_black)
+	next_turn()
+
 
 func in_bounds(pos: Vector2, bounds: Vector4):
 	return pos.x >= bounds.x \
@@ -205,6 +238,9 @@ func stone_captured(pos: Vector2i) -> void:
 	ui.update_captures(go.get_captured())
 
 func player_passed() -> void:
+	if online() and acting():
+		multiplayer_controller.passing_out()
+	
 	if passing:
 		# game is finished
 		# TODO: display this on a nice panel
@@ -222,3 +258,15 @@ func player_passed() -> void:
 		passing = true
 		current_stone.queue_free()
 		next_turn()
+
+
+func online() -> bool:
+	return player != Player.HOTSEAT
+func acting() -> bool:
+	if player == Player.HOTSEAT:
+		return true
+	if player == Player.BLACK and turn_black:
+		return true
+	if player == Player.WHITE and not turn_black:
+		return true
+	return false

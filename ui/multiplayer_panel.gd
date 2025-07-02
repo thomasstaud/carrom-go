@@ -60,12 +60,16 @@ func _on_connected():
 		ConnectionManager.join_game(_join_id)
 
 func _on_hosted(game_id):
+	_hosting = true
 	host_line_edit.show()
 	host_line_edit.text = game_id
 
 func _on_game_ready():
 	hide()
-	start_game.emit()
+	# determine color
+	# TODO: randomize this (synchronized ofc)
+	var player = Game.Player.BLACK if _hosting else Game.Player.WHITE
+	start_game.emit(player)
 
 
 func _on_host_button_pressed() -> void:
