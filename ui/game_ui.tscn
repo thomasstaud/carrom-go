@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://d0cn8jcmfck7l"]
+[gd_scene load_steps=15 format=3 uid="uid://d0cn8jcmfck7l"]
 
 [ext_resource type="Theme" uid="uid://dlbjtfagpatv2" path="res://ui/theme.tres" id="1_hgyfx"]
 [ext_resource type="Script" uid="uid://co26hhbdo4hdo" path="res://ui/game_ui.gd" id="2_vtgmo"]
@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://dr3ngx5inp3ww" path="res://ui/assets/pass.png" id="6_gm2vc"]
 [ext_resource type="Texture2D" uid="uid://bpadpmb8j8isy" path="res://ui/assets/banner_black.png" id="7_85ca7"]
 [ext_resource type="Texture2D" uid="uid://dml4owf7dv68b" path="res://ui/assets/banner_white.png" id="8_iqfqv"]
+[ext_resource type="Texture2D" uid="uid://bfcheqmj7qpq1" path="res://ui/assets/panel.png" id="9_f7kcv"]
+[ext_resource type="Texture2D" uid="uid://dlngg70esr6xe" path="res://ui/assets/menu.png" id="10_vad0l"]
 
 [sub_resource type="Animation" id="Animation_mfdv2"]
 length = 0.001
@@ -209,6 +211,80 @@ scale = Vector2(0.75, 0.75)
 texture = ExtResource("8_iqfqv")
 expand_mode = 1
 
+[node name="Panel" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_hgyfx")
+
+[node name="Texture" type="TextureRect" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -279.5
+offset_top = -189.5
+offset_right = 279.5
+offset_bottom = 189.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("9_f7kcv")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/Texture"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -196.0
+offset_top = -143.5
+offset_right = 196.0
+offset_bottom = 143.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="Panel/Texture/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 55
+text = "Black won the Game!
+Final Score: 6 to 5"
+horizontal_alignment = 1
+
+[node name="MenuButton" type="TextureButton" parent="Panel/Texture/VBoxContainer"]
+custom_minimum_size = Vector2(250, 90)
+layout_mode = 2
+texture_normal = ExtResource("3_f7kcv")
+texture_pressed = ExtResource("4_vad0l")
+texture_hover = ExtResource("5_fgkwl")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/Texture/VBoxContainer/MenuButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 27
+theme_override_constants/margin_bottom = 27
+
+[node name="TextureRect" type="TextureRect" parent="Panel/Texture/VBoxContainer/MenuButton/MarginContainer"]
+layout_mode = 2
+texture = ExtResource("10_vad0l")
+expand_mode = 2
+stretch_mode = 5
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 &"": SubResource("AnimationLibrary_iotsf")
@@ -216,3 +292,4 @@ libraries = {
 
 [connection signal="pressed" from="PassButtonBlack" to="." method="_on_pass_button_black_pressed"]
 [connection signal="pressed" from="PassButtonWhite" to="." method="_on_pass_button_white_pressed"]
+[connection signal="pressed" from="Panel/Texture/VBoxContainer/MenuButton" to="." method="_on_menu_button_pressed"]

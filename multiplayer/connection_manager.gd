@@ -22,6 +22,7 @@ func _ready() -> void:
 	
 	GDSync.client_joined.connect(_client_joined)
 
+
 func connect_to_server() -> void:
 	GDSync.start_multiplayer()
 
@@ -48,6 +49,7 @@ func _connected():
 	connected.emit()
 
 func _connection_failed(error: int):
+	# TODO: tell this to the panel
 	match(error):
 		ENUMS.CONNECTION_FAILED.INVALID_PUBLIC_KEY:
 			push_error("public or private key is invalid")
@@ -63,6 +65,7 @@ func _lobby_created(game_id: String):
 	join_game(game_id)
 
 func _lobby_creation_failed(game_id: String, error: int):
+	# TODO: tell this to the panel
 	match(error):
 		ENUMS.LOBBY_CREATION_ERROR.LOBBY_ALREADY_EXISTS:
 			push_error("duplicate game id %s" % game_id)

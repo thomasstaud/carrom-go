@@ -20,3 +20,10 @@ script = ExtResource("2_fc0e3")
 [node name="StoneContainer" type="Node2D" parent="."]
 
 [node name="UI" parent="." instance=ExtResource("4_4fuuu")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 1152.0
+offset_bottom = 648.0
+grow_horizontal = 1
+grow_vertical = 1

@@ -4,6 +4,7 @@ extends Node2D
 signal end_game
 
 enum State {
+	NONE,
 	POSITIONING,
 	AIMING,
 	SHOOTING,
@@ -61,6 +62,7 @@ func init(p_player: Player):
 	
 	ui.init(player)
 	ui.player_passed.connect(player_passed)
+	ui.back_to_menu.connect(func(): end_game.emit())
 	
 	next_turn()
 
@@ -242,18 +244,11 @@ func player_passed() -> void:
 		multiplayer_controller.passing_out()
 	
 	if passing:
-		# game is finished
-		# TODO: display this on a nice panel
-		var captured = go.get_captured()
-		if captured[1] > captured[2]:
-			print("White wins! %d to %d" % [captured[1], captured[2]])
-		elif captured[2] > captured[1]:
-			print("Black wins! %d to %d" % [captured[2], captured[1]])
-		else:
-			print("It's a tie! %d both" % captured[1])
-		# back to menu (for now)
-		# later, hook this up to a button on the nice panel
-		end_game.emit()
+		# if the other player has just passed as well, the game is over
+		ConnectionManager.disconnect_from_server()
+		current_stone.queue_free()
+		state = State.NONE
+		ui.game_finished(go.get_captured())
 	else:
 		passing = true
 		current_stone.queue_free()
