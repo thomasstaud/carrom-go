@@ -1,7 +1,10 @@
 class_name MultiplayerPanel
 extends Control
 
+signal start_game
+
 var _hosting: bool
+var _join_id: String
 
 @onready var connecting: TextureRect = $Texture/Connecting
 @onready var friend_selection: VBoxContainer = $Texture/FriendSelection
@@ -12,10 +15,13 @@ var _hosting: bool
 
 func _ready() -> void:
 	ConnectionManager.connected.connect(_on_connected)
+	ConnectionManager.hosted.connect(_on_hosted)
+	ConnectionManager.game_ready.connect(_on_game_ready)
 
 func random():
 	show()
 	_hosting = false
+	_join_id = ""
 	_connect()
 
 func friend():
@@ -23,6 +29,8 @@ func friend():
 	connecting.hide()
 	friend_selection.show()
 	waiting.hide()
+	
+	join_line_edit.text = ""
 
 
 func _connect():
@@ -45,11 +53,19 @@ func _on_connected():
 	friend_selection.hide()
 	waiting.show()
 	
+	host_line_edit.hide()
 	if _hosting:
-		host_line_edit.show()
-		host_line_edit.text = "HANS"
+		ConnectionManager.host_game()
 	else:
-		host_line_edit.hide()
+		ConnectionManager.join_game(_join_id)
+
+func _on_hosted(game_id):
+	host_line_edit.show()
+	host_line_edit.text = game_id
+
+func _on_game_ready():
+	hide()
+	start_game.emit()
 
 
 func _on_host_button_pressed() -> void:
@@ -57,8 +73,8 @@ func _on_host_button_pressed() -> void:
 	_connect()
 
 func _on_join_button_pressed() -> void:
-	var game_id = join_line_edit.text
-	if game_id == "":
+	_join_id = join_line_edit.text.to_upper()
+	if _join_id == "":
 		return
 	
 	_hosting = false
